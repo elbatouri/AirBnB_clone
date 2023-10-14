@@ -53,4 +53,3 @@ class BaseModel:
         "method that define the form of print"
         cl_name = self.__class__.__name__
         return "[{}] ({}) {}".format(cl_name, self.id, self.__dict__)
-
