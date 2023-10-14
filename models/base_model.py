@@ -24,8 +24,6 @@ class BaseModel:
             for key, value in kwargs.items():
                 if key == "created_at" or key == "updated_at":
                     self.__dict__[key] = datetime.strptime(value, tf)
-                elif key == "id":
-                    self.__dict__[key] = str(value)
                 else:
                     self.__dict__[key] = value
         else:
