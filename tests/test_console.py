@@ -5,7 +5,7 @@ a unittest for the console
 import unittest
 from unittest.mock import patch
 from io import StringIO
-from your_module import HBNBCommand
+from console import HBNBCommand
 
 
 class TestHBNBCommand(unittest.TestCase):
