@@ -9,9 +9,12 @@ from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
 
+
 class HBNBCommand(cmd.Cmd):
+    """HBNBCommand class inheriting from cmd"""
     prompt = "(hbnb) "
-    class_list = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]
+    class_list = ["BaseModel", "User", "State", "City",
+                  "Amenity", "Place", "Review"]
     class_errors = {
         "missing_name": "** class name missing **",
         "not_exist": "** class doesn't exist **",
@@ -148,4 +151,3 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
-
