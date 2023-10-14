@@ -26,3 +26,7 @@ class BaseModel:
         """returns a custom string representation for instances of BasModel class"""
         return f"[{}] ({}) {}".format(self.__class__.__name__,
                                       self.id, self.__dict__)
+    def save(self):
+        """change the updated time to current"""
+        self.updated_at = datetime.today()
+        models.storage.save()
