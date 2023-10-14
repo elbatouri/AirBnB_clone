@@ -18,9 +18,6 @@ class BaseModel:
 
         """
         tf = "%Y-%m-%dT%H:%M:%S.%f"
-        self.id = str(uuid4())
-        self.created_at = datetime.today()
-        self.updated_at = datetime.today()
 
         if kwargs:
 
@@ -30,6 +27,9 @@ class BaseModel:
                 else:
                     self.__dict__[key] = value
         else:
+            self.id = str(uuid4())
+            self.created_at = datetime.today()
+            self.updated_at = datetime.today()
             models.storage.new(self)
 
     def save(self):
