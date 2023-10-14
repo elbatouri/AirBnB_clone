@@ -100,7 +100,7 @@ class HBNBCommand(cmd.Cmd):
         args = line.split()
         if not args:
             print(self.class_errors["missing_name"])
-        elif args[0] not in this.class_list:
+        elif args[0] not in self.class_list:
             print(self.class_errors["not_exist"])
         elif len(args) < 2:
             print(self.class_errors["missing_id"])
