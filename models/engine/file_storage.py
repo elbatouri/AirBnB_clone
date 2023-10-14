@@ -26,7 +26,8 @@ class FileStorage:
 
     def new(self, obj):
         """Serialize __objects to the JSON file __file_path."""
-        FileStorage.__objects["{}.{}".format(obj.__class__.__name__, obj.id)] = obj
+        FileStorage.__objects["{}.{}".format(obj.__class__.__name__,
+                              obj.id)] = obj
 
     def save(self):
         """serialize the object stored"""
@@ -45,5 +46,4 @@ class FileStorage:
                     del o["__class__"]
                     self.new(eval(cl_name)(**o))
         except FileNotFoundError:
-           return
-
+            return
