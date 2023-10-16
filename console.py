@@ -172,7 +172,7 @@ class HBNBCommand(cmd.Cmd):
         """
         args = shlex.split(line)
         if len(args) != 2:
-            print("Invalid command format. Usage: <class name>.destroy(<id>)")
+            print(self.class_errors["no_instance"])
             return
 
         class_name = args[0]
