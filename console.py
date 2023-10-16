@@ -2,6 +2,7 @@
 import cmd
 from models import storage
 import shlex
+import re
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -52,23 +53,40 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print(self.class_errors["not_exist"])
 
-        elif line.startswith("User.destroy(\"") and line.endswith("\")"):
-            # Extract the instance ID from the line
-            instance_id = line.replace("User.destroy(\"", "").replace("\")", "")
+        elif re.match(r"(\w+)\.destroy\(\"([^\"]+)\"\)", line):
+            # Pattern matches <class name>.destroy("<instance_id>") format
+            match = re.match(r"(\w+)\.destroy\(\"([^\"]+)\"\)", line)
+            class_name, instance_id = match.groups()
 
-            # Check if the class "User" exists
-            if "User" not in self.class_list:
-                print(self.class_errors["not_exist"])
-            else:
+            if class_name in self.class_list:
                 obj_dict = storage.all()
-                key = "User.{}".format(instance_id)
+                key = "{}.{}".format(class_name, instance_id)
 
                 if key in obj_dict:
                     del obj_dict[key]
                     storage.save()
                 else:
                     print(self.class_errors["no_instance"])
+            else:
+                print(self.class_errors["not_exist"])
+        elif re.match(r"(\w+)\.update\(\"([^\"]+)\", "
+                      r"\"([^\"]+)\", \"([^\"]+)\"\)", line):
+            match = re.match(r"(\w+)\.update\(\"([^\"]"
+                             r"+)\", \"([^\"]+)\", \"([^\"]+)\"\)", line)
+            class_name, instance_id, attribute, value = match.groups()
 
+            if class_name in self.class_list:
+                obj_dict = storage.all()
+                key = "{}.{}".format(class_name, instance_id)
+
+                if key in obj_dict:
+                    obj = obj_dict[key]
+                    setattr(obj, attribute, value)
+                    obj.save()
+                else:
+                    print(self.class_errors["no_instance"])
+            else:
+                print(self.class_errors["not_exist"])
         else:
             print("Command not recognized")
 
@@ -176,29 +194,6 @@ class HBNBCommand(cmd.Cmd):
                     if value.__class__.__name__ == args[0]:
                         print(value)
 
-    def do_update(self, line):
-        """Update the attributes of an instance"""
-        args = line.split()
-        obj_dict = storage.all()
-        if not args:
-            print(self.class_errors["missing_name"])
-        elif args[0] not in self.class_list:
-            print(self.class_errors["not_exist"])
-        elif len(args) < 2:
-            print(self.class_errors["missing_id"])
-        else:
-            key = "{}.{}".format(args[0], args[1])
-            if key in obj_dict:
-                if len(args) < 3:
-                    print(self.class_errors["missing_attribute"])
-                elif len(args) < 4:
-                    print(self.class_errors["missing_value"])
-                else:
-                    obj = obj_dict[key]
-                    setattr(obj, args[2], args[3].replace("\"", ""))
-                    obj.save()
-
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
- 
