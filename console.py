@@ -191,7 +191,7 @@ class HBNBCommand(cmd.Cmd):
             del obj_dict[key]
             storage.save()
         else:
-            print(self.class_errors["no_instance"])
+            print("Invalid command format. Usage: <class name>.destroy(<id>)")
 
     def do_all(self, line):
         """Display all instances of a class or all classes"""
