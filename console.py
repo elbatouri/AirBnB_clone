@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import cmd
 from models import storage
+import shlex
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -43,7 +44,15 @@ class HBNBCommand(cmd.Cmd):
                 print(count)
             else:
                 print(self.class_errors["not_exist"])
+
         elif line.endswith(".all()"):
+            class_name = line.split(".")[0]
+            if class_name in self.class_list:
+                self.show_instances(class_name)
+            else:
+                print(self.class_errors["not_exist"])
+
+        elif line.endswith(".show()"):
             class_name = line.split(".")[0]
             if class_name in self.class_list:
                 self.show_instances(class_name)
@@ -83,6 +92,23 @@ class HBNBCommand(cmd.Cmd):
         args = line.split()
         if not args:
             print(self.class_errors["missing_name"])
+        elif args[0] not in self.class_list:
+            print(self.class_errors["not_exist"])
+        elif len(args) < 2:
+            print(self.class_errors["missing_id"])
+        else:
+            obj_dict = storage.all()
+            key = "{}.{}".format(args[0], args[1])
+            if key in obj_dict:
+                print(obj_dict[key])
+            else:
+                print(self.class_errors["no_instance"])
+
+    def do_user_show(self, line):
+        """Show user details by ID."""
+        args = shlex.split(line)
+        if not args:
+            print(self.class_errors["missing_id"])
         elif args[0] not in self.class_list:
             print(self.class_errors["not_exist"])
         elif len(args) < 2:
