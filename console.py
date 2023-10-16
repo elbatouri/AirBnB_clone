@@ -15,7 +15,7 @@ class HBNBCommand(cmd.Cmd):
     """HBNBCommand class inheriting from cmd"""
     prompt = "(hbnb) "
     class_list = ["BaseModel", "User", "State", "City",
-                  "Amenity", "Place", "Review"]
+                  "Amenity", "Place", "Review", "destroy"]
     class_errors = {
         "missing_name": "** class name missing **",
         "not_exist": "** class doesn't exist **",
@@ -52,12 +52,23 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print(self.class_errors["not_exist"])
 
-        elif line.endswith(".show()"):
-            class_name = line.split(".")[0]
-            if class_name in self.class_list:
-                self.show_instances(class_name)
-            else:
+        elif line.startswith("User.destroy(\"") and line.endswith("\")"):
+            # Extract the instance ID from the line
+            instance_id = line.replace("User.destroy(\"", "").replace("\")", "")
+
+            # Check if the class "User" exists
+            if "User" not in self.class_list:
                 print(self.class_errors["not_exist"])
+            else:
+                obj_dict = storage.all()
+                key = "User.{}".format(instance_id)
+
+                if key in obj_dict:
+                    del obj_dict[key]
+                    storage.save()
+                else:
+                    print(self.class_errors["no_instance"])
+
         else:
             print("Command not recognized")
 
@@ -122,20 +133,33 @@ class HBNBCommand(cmd.Cmd):
                 print(self.class_errors["no_instance"])
 
     def do_destroy(self, line):
-        """Destroy an instance by its ID"""
-        args = line.split()
-        if not args:
-            print(self.class_errors["missing_name"])
-        elif args[0] not in self.class_list:
+        """
+        Destroy an instance based on its ID.
+        Usage: <class name>.destroy(<id>)
+        Example: User.destroy(9aa2abd1-6ca1-4efe-9c6f-519bee7bc300)
+        """
+        args = shlex.split(line)
+        if len(args) != 2:
+            print("Invalid command format. Usage: <class name>.destroy(<id>)")
+            return
+
+        class_name = args[0]
+        instance_id = args[1]
+
+        # Check if the class exists
+        if class_name not in self.class_list:
             print(self.class_errors["not_exist"])
-        elif len(args) < 2:
-            print(self.class_errors["missing_id"])
+            return
+
+        # Construct the key to look for in the storage dictionary
+        key = "{}.{}".format(class_name, instance_id)
+        obj_dict = storage.all()
+
+        if key in obj_dict:
+            del obj_dict[key]
+            storage.save()
         else:
-            obj_dict = storage.all()
-            key = "{}.{}".format(args[0], args[1])
-            if key in obj_dict:
-                del obj_dict[key]
-                storage.save()
+            print(self.class_errors["no_instance"])
 
     def do_all(self, line):
         """Display all instances of a class or all classes"""
@@ -177,3 +201,4 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
+ 
