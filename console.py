@@ -87,6 +87,19 @@ class HBNBCommand(cmd.Cmd):
                     print(self.class_errors["no_instance"])
             else:
                 print(self.class_errors["not_exist"])
+        elif re.match(r"(\w+)\.show\(\"([^\"]+)\"\)", line):
+            # Pattern matches <class name>.destroy("<instance_id>") format
+            match = re.match(r"(\w+)\.show\(\"([^\"]+)\"\)", line)
+            class_name, instance_id = match.groups()
+            if class_name in self.class_list:
+                obj_dict = storage.all()
+                key = "{}.{}".format(class_name, instance_id)
+
+                if key in obj_dict:
+                    self.show_instances(class_name)
+                else:
+                    print(self.class_errors["no_instance"])
+
         else:
             print("Command not recognized")
 
