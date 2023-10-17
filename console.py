@@ -3,6 +3,8 @@
 import cmd
 from models import storage
 import shlex
+import re
+
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -10,6 +12,8 @@ from models.city import City
 from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
+
+
 class HBNBCommand(cmd.Cmd):
     """HBNBCommand class inheriting from cmd"""
     prompt = "(hbnb) "
@@ -51,6 +55,37 @@ class HBNBCommand(cmd.Cmd):
             class_name = line.split(".")[0]
             if class_name in self.class_list:
                 self.show_instances(class_name)
+            else:
+                print(self.class_errors["not_exist"])
+
+        elif re.match(r"(\w+)\.update\(\"([^\"]+)\", "
+                      r"\"([^\"]+)\", \"([^\"]+)\"\)", line):
+            match = re.match(r"(\w+)\.update\(\"([^\"]"
+                             r"+)\", \"([^\"]+)\", \"([^\"]+)\"\)", line)
+            class_name, instance_id, attribute, value = match.groups()
+
+            if class_name in self.class_list:
+                obj_dict = storage.all()
+                key = "{}.{}".format(class_name, instance_id)
+
+                if key in obj_dict:
+                    obj = obj_dict[key]
+                    setattr(obj, attribute, value)
+                    obj.save()
+                else:
+                    print(self.class_errors["no_instance"])
+            else: print(self.class_errors["not_exist"])
+
+        elif re.match(r"(\w+)\.show\(\"([^\"]+)\"\)", line):
+            # Pattern matches <class name>.destroy("<instance_id>") format
+            match = re.match(r"(\w+)\.show\(\"([^\"]+)\"\)", line)
+            class_name, instance_id = match.groups()
+            if class_name in self.class_list:
+                obj_dict = storage.all()
+                key = "{}.{}".format(class_name, instance_id)
+                if key in obj_dict:
+                else:
+                    print(self.class_errors["no_instance"])
             else:
                 print(self.class_errors["not_exist"])
         else:
@@ -164,6 +199,6 @@ class HBNBCommand(cmd.Cmd):
                     setattr(obj, args[2], args[3].replace("\"", ""))
                     obj.save()
 
-                    
+
 if __name__ == '__main__':
     HBNBCommand().cmdloop() 
